@@ -97,6 +97,9 @@ public class AuthorizableCreatorServiceImpl implements
             installAuthorizableConfigurationBean(session,
                     tmpPricipalConfigBean, status,
                     authorizableInstallationHistory);
+            
+            //DEBUG (RWH) - adding intermediate saves (NPR-15021)
+            session.save();
         }
 
     }

@@ -197,7 +197,33 @@ public class AceServiceImpl implements AceService {
         String msg = "*** Starting installation of "+aceMapFromConfig.size()+" ACLs in content nodes...";
         LOG.info(msg);
         history.addMessage(msg);
-        AcHelper.installPathBasedACEs(pathBasedAceMapFromConfig, session, history);
+        
+        //DEBUG (RWH) - intermediate commits (NPR-15021)
+        
+        // Creating another session as the original session (method parameter) was opened before 
+        // the authorizables session(see below: installAuthorizables() )
+        // This sesison  has been open for quite some time, so I find it appropriate to create 
+        // a new session for ACEs here.
+        // creating a new try-catch
+        Session aceInstallationSession = repository.loginAdministrative(null);
+        try {
+	        
+	        AcHelper.installPathBasedACEs(pathBasedAceMapFromConfig, aceInstallationSession, history);
+	        
+	        //DEBUG (RWH) - intermediate commits (NPR-15021)
+	        // saving the session one last time
+	        aceInstallationSession.save();
+	        
+        }catch (Exception e) {
+            throw e;
+        } finally {
+        	//DEBUG (RWH) - intermediate commits (NPR-15021)
+	        // closing the session
+            if (aceInstallationSession != null) {
+            	aceInstallationSession.logout();
+            }
+        }
+        
     }
 
     private void installAuthorizables(

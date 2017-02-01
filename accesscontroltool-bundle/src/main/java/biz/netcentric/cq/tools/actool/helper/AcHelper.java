@@ -128,6 +128,9 @@ public class AcHelper {
                 history.addVerboseMessage(message);
             }
             writeAcBeansToRepository(session, history, orderedAceBeanSetFromConfig);
+            
+            //DEBUG (RWH) - intermediate commits (NPR-15021)
+            session.save();
         }
     }
 
